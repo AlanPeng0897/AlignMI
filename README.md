@@ -16,8 +16,8 @@ Visit the shared Google Drive folder:  [👉Pretrained models](https://drive.goo
 
 Download the contents and place them into the project directory. 
 
-
-## 🧠 Tangent-Space Basis Computation
+## 🔍 Empirical Validation of the Hypothesis
+### 🧠 Tangent-Space Basis Computation
 
 This step encodes input images using a pretrained VAE and computes the tangent-space basis of the data manifold via JVP + SVD. The results are saved as `(x, y, U)` tuples for downstream analysis.
 
@@ -50,7 +50,7 @@ done
 
 
 
-## 🧩 Training the Alignment-Aware Model
+### 🧩 Training the Alignment-Aware Model
 
 Assuming your tangent-space files (e.g., `x_y_U_list_subset0.pt`) are ready, launch the alignment-aware training with:
 
