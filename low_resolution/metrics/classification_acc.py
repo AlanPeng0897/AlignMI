@@ -69,7 +69,7 @@ class ClassificationAccuracy():
                                        dim=0).mean().cpu().item()
 
             predictions = torch.cat(predictions, dim=0).cpu()
-            top5_predictions = torch.cat(top5_predictions, dim=0)  # 合并所有批次的 top-5 预测
+            top5_predictions = torch.cat(top5_predictions, dim=0)
 
             # Compute class-wise precision
             target_list = targets.cpu().tolist()
@@ -80,7 +80,7 @@ class ClassificationAccuracy():
                 precision = torch.sum(predictions[mask] == t) / torch.sum(targets == t)
 
                 top5_correct = torch.sum(top5_predictions[mask] == t, dim=1) > 0  #
-                top5_precision = torch.sum(top5_correct).float() / torch.sum(targets == t)  # 计算 top-5 precision
+                top5_precision = torch.sum(top5_correct).float() / torch.sum(targets == t)
 
                 precision_list.append(
                     [t, conf_masked.mean().item(),
