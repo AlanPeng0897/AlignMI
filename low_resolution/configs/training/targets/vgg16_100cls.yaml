@@ -1,0 +1,40 @@
+---
+seed: 42
+
+model:
+  architecture: VGG16
+  num_classes: 100
+  pretrained: true
+  resume_path: ./results/VGG16_100_vanilla/VGG16_0.8750.pth
+
+dataset:
+  name: celeba
+  train_file_path: ./datasets/celeba/meta/trainset_100.txt
+  test_file_path: ./datasets/celeba/meta/testset_100.txt
+  img_path: /home/comp/csxpeng/code/56914551/attack_datasets/CelebA_new/img_align_celeba
+  validation_set_size: 0
+  transformations:
+    crop_size: 108
+    image_size: 64
+    offset_height: 55
+    offset_width: 35
+
+optimizer:
+  SGD:
+    lr: 0.01
+    momentum: 0.9
+    weight_decay: 0.0001
+
+lr_scheduler:
+  MultiStepLR:
+    milestones: [100]
+    gamma: 0.2
+
+training:
+  align_train: 1
+  num_epochs: 30
+  batch_size: 128
+  dataloader_num_workers: 2
+  align_coeff: 0.5
+  num_random_label: 100
+  save_path: ./results

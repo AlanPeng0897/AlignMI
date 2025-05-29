@@ -1,0 +1,54 @@
+---
+seed: 42
+
+model:
+  architecture: VGG16
+  num_classes: 1000
+  pretrained: true
+  # (if finetune on some model, set resume_path)
+  resume_path: /home/comp/csxpeng/code/NIPS2025_low_resol/checkpoints/target_model/target_ckp/VGG16_88.26.tar 
+
+dataset:
+  name: celeba
+  train_file_path: ./datasets/celeba/meta/trainset.txt
+  test_file_path: ./datasets/celeba/meta/testset.txt
+  gan_file_path: ./datasets/celeba/meta/ganset.txt
+  img_path: /home/comp/csxpeng/code/56914551/attack_datasets/CelebA_new/img_align_celeba
+  validation_set_size: 0
+  transformations:
+    crop_size: 108
+    image_size: 64
+    offset_height: 55
+    offset_width: 35
+
+transformations:
+  ToPILImage: {}
+  Resize:
+    size: [64, 64]
+  RandomHorizontalFlip:
+    p: 0.5
+
+adv_cfg:
+  train_method: TRADES
+  loss_fn: cent
+  category: trades
+  eps: 4/255
+  sts: 5/2550
+  num_steps: 1
+  
+optimizer:
+  SGD:
+    lr: 0.001
+    momentum: 0.9
+    weight_decay: 0.0001
+
+lr_scheduler:
+  MultiStepLR:
+    milestones: [70, 90]
+    gamma: 0.2
+
+training:
+  num_epochs: 5
+  batch_size: 64
+  dataloader_num_workers: 2
+  save_path: results
