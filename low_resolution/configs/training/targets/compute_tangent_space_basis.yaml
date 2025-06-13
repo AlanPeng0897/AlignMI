@@ -6,7 +6,7 @@ dataset:
   name: celeba
   train_file_path: ./datasets/celeba/meta/trainset_100.txt
   test_file_path: ./datasets/celeba/meta/testset_100.txt
-  img_path: /home/comp/csxpeng/code/56914551/attack_datasets/CelebA_new/img_align_celeba
+  img_path: /home/code/56914551/attack_datasets/CelebA_new/img_align_celeba
   validation_set_size: 0
   crop_size: 108
   image_size: 64
