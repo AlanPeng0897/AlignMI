@@ -9,7 +9,7 @@ dataset:
   test_file_path: ./datasets/celeba/meta/testset.txt
   gan_file_path: ./datasets/celeba/meta/ganset.txt
   private_file_path: ./datasets/celeba/meta/private.txt
-  img_path: /home/comp/csxpeng/code/56914551/attack_datasets/CelebA_new/img_align_celeba
+  img_path: /home/code/56914551/attack_datasets/CelebA_new/img_align_celeba
   p_reg_path: ./checkpoints/p_reg
   crop_size: 108
   offset_height: 55
