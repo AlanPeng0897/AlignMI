@@ -1,0 +1,69 @@
+---
+seed: 42
+
+root_path: ./attack_results/
+
+dataset:
+  name: celeba
+  train_file_path: ./datasets/celeba/meta/trainset.txt
+  test_file_path: ./datasets/celeba/meta/testset.txt
+  gan_file_path: ./datasets/celeba/meta/ganset.txt
+  private_file_path: ./datasets/celeba/meta/private.txt
+  img_path: ./datasets/celeba/img_align_celeba
+  p_reg_path: ./checkpoints/p_reg
+  crop_size: 108
+  offset_height: 55
+  offset_width: 35
+  image_size: 64
+  
+
+gan:
+  prior: celeba
+  dcgan_model_dir: ./checkpoints/GAN
+  n_classes: 1000
+
+
+target_model:
+  architecture: VGG16, efficientnet_b0, efficientnet_b1, efficientnet_b2
+  n_classes: 1000
+  weights: ./results/celeba_VGG16/standard/Classifier_0.8710.pth,./checkpoints/aug_ckp/celeba/VGG16_efficientnet_b0_0.02_1.0/VGG16_efficientnet_b0_kd_0_20.pt,./checkpoints/aug_ckp/celeba/VGG16_efficientnet_b1_0.02_1.0/VGG16_efficientnet_b1_kd_0_20.pt,./checkpoints/aug_ckp/celeba/VGG16_efficientnet_b2_0.02_1.0/VGG16_efficientnet_b2_kd_0_20.pt
+
+
+evaluation_model:
+  architecture: FaceNet
+  num_classes: 1000
+  weights: ./checkpoints/eval_model/FaceNet_95.88.tar
+
+candidates:
+  num_candidates: 100
+
+attack:
+  method: kedmi
+  loss: logit_loss
+  classid: '0,1,2,3'
+  batch_size: 100
+  num_iterations: 100 # (1) 200 for baseline and TAA (2) 100 for PAA
+  targets: 0-100
+  lr: 0.02
+  lam: 1.0
+  z_dim: 100
+  momentum: 0.9
+  identity_weight: 100.0
+  single_z: false
+  clipz: true
+
+
+transformations:
+  ToPILImage: {}
+  Resize:
+    size: [64, 64]
+  RandomHorizontalFlip:
+    p: 0.5
+    
+optimizer:
+  SGD:
+    lr: 0.01
+    momentum: 0.9
+
+final_selection:
+  samples_per_target: 100

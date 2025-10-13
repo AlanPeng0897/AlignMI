@@ -6,14 +6,14 @@ model:
   num_classes: 1000
   pretrained: true
   # (if finetune on some model, set resume_path)
-  resume_path: /home/code/NIPS2025_low_resol/checkpoints/target_model/target_ckp/VGG16_88.26.tar 
+  resume_path: ./checkpoints/target_model/target_ckp/VGG16_88.26.tar
 
 dataset:
   name: celeba
   train_file_path: ./datasets/celeba/meta/trainset.txt
   test_file_path: ./datasets/celeba/meta/testset.txt
   gan_file_path: ./datasets/celeba/meta/ganset.txt
-  img_path: /home/code/56914551/attack_datasets/CelebA_new/img_align_celeba
+  img_path: ./data/celeba/img_align_celeba
   validation_set_size: 0
   transformations:
     crop_size: 108

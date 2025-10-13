@@ -1,5 +1,4 @@
 import torch
-import torch.nn.functional as F
 
 def max_margin_loss(out, iden):
     real = out.gather(1, iden.unsqueeze(1)).squeeze(1)

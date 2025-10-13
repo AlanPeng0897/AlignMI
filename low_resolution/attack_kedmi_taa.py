@@ -11,7 +11,6 @@ import numpy as np
 import torch
 from torch.utils.data import TensorDataset
 from utils import utils
-from attacks.final_selection import perform_final_selection
 from attacks.optimize import Optimization
 from metrics.fid_score import FID_Score
 from metrics.prcd import PRCD
@@ -29,12 +28,12 @@ def create_parser():
     parser.add_argument('-c',
                         '--config',
                         # default='./configs/attacking/GMI_CelebA1000.yaml',
-                        default='./configs/attacking/KEDMI_CelebA1000_vgg16_celeba.yaml',
+                        default='./configs/attacking/ked_dcgan-celeba_vgg16-celeba.yaml',
                         type=str,
                         dest="config",
                         help='Config .json file path (default: None)')
 
-    parser.add_argument('--exp_name', '-exp', default='stylegan_celeba_100cls_test', help='')
+    parser.add_argument('--exp_name', '-exp', default='dcgan_celeba_vgg16', help='')
     
     return parser
 
@@ -120,7 +119,8 @@ def attack_single_id(targetnets, G, D, evaluation_model, targets_single_id):
     torch.save(final_z.detach(), final_z_path)
     torch.save(z_optimized_unselected.detach(), final_z_unselected_path)
 
-    evaluate_results(evaluation_model, G,
+    evaluate_results(evaluation_model,
+                    G, False,
                     batch_size, idx_to_class,
                     final_z, final_targets,
                     training_dataset,
@@ -199,8 +199,6 @@ if __name__ == '__main__':
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
     
     save_dir = f"{prefix}/{args.exp_name}_{current_time}"
-
-    # save_dir = f"{prefix}/{current_time}"
 
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     config.save_config(save_dir)

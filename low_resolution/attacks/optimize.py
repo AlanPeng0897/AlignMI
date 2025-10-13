@@ -1,26 +1,20 @@
-from losses.reg_loss import reg_loss
-from utils.utils import low2high, log_sum_exp
-import math
-from torch.autograd import Variable
-import torchvision.utils as vutils
-import matplotlib.pyplot as plt
-from skimage import exposure
 import os
-# from torch import 
-
-from functorch import vmap, jvp
-# from torch.autograd.functional import jvp
-import numpy as np
 import torch
 import torch.nn as nn
+import torchvision.transforms as T
+import torch.nn.functional as F
+
 from losses.poincare import poincare_loss
 from losses.max_margin import max_margin_loss
 from matplotlib import colors
-import torchvision.transforms as T
-import torch.nn.functional as F
 from torchvision.transforms import InterpolationMode
 from kornia import augmentation
 from utils.logger import save_grid_with_cmap
+from torch.autograd import Variable
+from skimage import exposure
+from losses.reg_loss import reg_loss
+from utils.utils import low2high, log_sum_exp
+from functorch import vmap, jvp
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -43,23 +37,6 @@ def build_transformations(transformations_dict=None) -> T.Compose:
             "center": None
         }
     }
-    # transformations_dict = {
-    #     "RandomResizedCrop": {
-    #         "size": 64,
-    #         "scale": [0.7, 1.0],
-    #         "ratio": [0.9, 1.1],
-    #         "antialias": True
-    #     },
-    #     "RandomHorizontalFlip": {
-    #         "p": 0.5
-    #     },
-    #     "RandomRotation": {
-    #         "degrees": 5,               # ±5°
-    #         "interpolation": InterpolationMode.BILINEAR,
-    #         "expand": False,
-    #         "center": None
-    #     }
-    # }
     
     transformation_list = []
     
@@ -85,13 +62,6 @@ def ked_build_transformations(transformations_dict=None) -> T.Compose:
             "ratio": [0.9, 1.1],  
             "antialias": True     
         },
-    # transformations_dict = {
-    #     "RandomResizedCrop": {
-    #         "size": 64,
-    #         "scale": [0.9, 1.0],
-    #         "ratio": [0.9, 1.1],
-    #         "antialias": True
-    #     },
         "RandomHorizontalFlip": {
             "p": 0.5
         },
@@ -177,18 +147,12 @@ class Optimization():
             if z_batch.grad is not None:
                 z_batch.grad.data.zero_()
 
-            # # Compute discriminator output
-            # if self.config.improved_flag:
-            #     _, label = self.discriminator(imgs)
-            # else:
-            #     label = self.discriminator(imgs)
-            
             # Compute losses
+            # label = self.discriminator(imgs)
             # prior_loss = self.compute_prior_loss(label)
             
             prior_loss = 0.0
             if self.use_poincare_loss == True:
-                prior_loss = 0.0
                 _, outputs = self.targetnets[0](imgs)
                 iden_loss = poincare_loss(outputs, targets_batch).mean()
                 
@@ -270,16 +234,10 @@ class Optimization():
                 print_every = 100
                 viz_every = 200
 
-            # Compute discriminator output
-            # if self.config.improved_flag:
-            #     _, label = self.discriminator(imgs)
-            # else:
-            #     label = self.discriminator(imgs)
-            
             # Compute losses
+            # label = self.discriminator(imgs)
             # prior_loss = self.compute_prior_loss(label)
-            
-            
+
             prior_loss = 0.0
             iden_loss = self.iden_loss(self.targetnets, imgs, targets_batch, self.attack_loss, self.criterion, self.lam) if self.identity_weight > 0 else torch.tensor(0.0, device=device)
 
@@ -438,7 +396,7 @@ class Optimization():
                 retain_graph=False
             )[0]
             
-            z_batch.grad = z_grad  # 替换为 SmoothGrad 计算的梯度
+            z_batch.grad = z_grad
             
             v_prev = v.clone()
             gradient = z_batch.grad.data
@@ -474,15 +432,12 @@ class Optimization():
                                                               f'x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5, handle_imgs=1
                     )
-                    
-                    
                     grad_x = grad_x.detach().cpu()
                     save_grid_with_cmap(
                         grad_x[:25], os.path.join(self.save_dir,
                                                 f'grad_x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5
                     )
-                    
                     smooth_grad_x = smooth_grad.detach().cpu() 
                     save_grid_with_cmap(
                         smooth_grad_x[:25], os.path.join(self.save_dir, 
@@ -689,7 +644,6 @@ class Optimization():
                                                               f'x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5, handle_imgs=1
                     )
-                    
                     grad_x = imgs.grad.detach().cpu()
                     save_grid_with_cmap(
                         grad_x[:25], os.path.join(self.save_dir,
@@ -796,23 +750,18 @@ class Optimization():
                                                               f'x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5, handle_imgs=1
                     )
-                    
-                    
                     grad_x = grad_x.detach().cpu()
                     save_grid_with_cmap(
                         grad_x[:25], os.path.join(self.save_dir,
                                                 f'grad_x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5
                     )
-                    
                     smooth_grad_x = smooth_grad.detach().cpu() 
                     save_grid_with_cmap(
                         smooth_grad_x[:25], os.path.join(self.save_dir, 
                                                         f'smooth_x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5
                     )
-
-
 
         final_z = self.reparameterize_batch(mu, log_var, batch_size)
         final_z = torch.clamp(final_z, -self.clip_range, self.clip_range).float()
@@ -832,7 +781,6 @@ class Optimization():
         optimizer = self.config.create_optimizer(params=params)
         scheduler = self.config.create_lr_scheduler(optimizer)
 
-        
         for i in range(num_iterations):
             z = self.reparameterize_batch(mu, log_var, batch_size)
             if clipz:
@@ -910,23 +858,18 @@ class Optimization():
                                                               f'x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5, handle_imgs=1
                     )
-                    
-                    
                     grad_x = grad_x.detach().cpu()
                     save_grid_with_cmap(
                         grad_x[:25], os.path.join(self.save_dir,
                                                 f'grad_x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5
                     )
-                    
                     trans_grad_x = trans_grad.detach().cpu() 
                     save_grid_with_cmap(
                         trans_grad_x[:25], os.path.join(self.save_dir, 
                                                         f'smooth_x_Batch_{batch_i + 1}_iter_{i + 1:02d}_conf_{mean_conf:.4f}.png'),
                         nrow=5
                     )
-
-
 
         final_z = self.reparameterize_batch(mu, log_var, batch_size)
         final_z = torch.clamp(final_z, -self.clip_range, self.clip_range).float()

@@ -9,7 +9,7 @@ dataset:
   test_file_path: ./datasets/celeba/meta/testset.txt
   gan_file_path: ./datasets/celeba/meta/ganset.txt
   private_file_path: ./datasets/celeba/meta/private.txt
-  img_path: /home/code/56914551/attack_datasets/CelebA_new/img_align_celeba
+  img_path: ./datasets/celeba/img_align_celeba
   p_reg_path: ./checkpoints/p_reg
   crop_size: 108
   offset_height: 55
@@ -17,7 +17,7 @@ dataset:
   image_size: 64
   
 gan:
-  prior: celeba
+  prior: ffhq
   dcgan_model_dir: ./checkpoints/GAN
   stylegan_model_dir: ./checkpoints/stylegan
   n_classes: 1000
@@ -41,7 +41,7 @@ attack:
   loss: logit_loss
   classid: '0,1,2,3'
   batch_size: 20
-  num_iterations: 50 
+  num_iterations: 100
   targets: 0-100
   lr: 0.02
   lam: 1.0

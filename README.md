@@ -1,4 +1,12 @@
+<h1 align="center">Generative Model Inversion Through the Lens of the Manifold Hypothesis</h1>
+<p align="center">
+    <a href="https://github.com/AlanPeng0897/AlignMI"><img src="https://img.shields.io/badge/-Github-grey?logo=github" alt="Github"></a>
+    <a href="https://arxiv.org/pdf/2509.20177"> <img src="https://img.shields.io/badge/NeurIPS'25-blue" alt="License"> </a>
+</p>
+
+
 # Generative Model Inversion Through the Lens of the Manifold Hypothesis
+Hi, this is the code for our NeurIPS 2025 paper: *[Generative Model Inversion Through the Lens of the Manifold Hypothesis](https://arxiv.org/pdf/2509.20177)*.
 This repository provides tools to empirically validate gradient–manifold alignment hypotheses and train alignment-aware models for improved model inversion.
 
 ---

@@ -1,0 +1,70 @@
+---
+seed: 42
+
+model:
+  architecture: resnet50
+  num_classes: 1000
+  pretrained: true
+
+dataset:
+  type: celeba_identities
+  validation_set_size: 0
+  image_size: 224
+
+transformations:
+  RandomResizedCrop:
+    size: [224, 224]
+    scale: [0.85, 1]
+    ratio: [1, 1]
+    antialias: true
+#  ColorJitter:
+#    brightness: 0.2
+#    contrast: 0.2
+#    saturation: 0.1
+#    hue: 0.1
+  RandomHorizontalFlip:
+    p: 0.5
+
+adv_cfg:
+  train_method: TRADES
+  loss_fn: cent
+  category: trades
+  eps: 4/255
+  sts: 9/2550
+  num_steps: 1
+
+optimizer:
+  Adam:
+    lr: 0.001
+    betas: [0.9, 0.999]
+    weight_decay: 0.0
+
+# optimizer:
+#   SGD:
+#     lr: 0.001
+#     momentum: 0.9
+#     weight_decay: 0.0
+#     nesterov: False
+
+lr_scheduler:
+  MultiStepLR:
+    milestones: [25, 40]
+    gamma: 0.1
+
+training:
+  num_epochs: 50
+  batch_size: 128
+  label_smoothing: 0.0
+  dataloader_num_workers: 8
+  save_path: results/
+
+rtpt:
+  experiment_name: Training target classifier
+  name_initials: XX
+
+wandb:
+  enable_logging: false
+  args:
+    project: model_inversion_targets_celeba
+    name: DenseNet121_CelebA
+    save_code: true

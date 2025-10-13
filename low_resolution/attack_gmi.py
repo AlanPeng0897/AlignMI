@@ -11,12 +11,10 @@ import numpy as np
 import torch
 from torch.utils.data import TensorDataset
 from utils import utils
-from attacks.final_selection import perform_final_selection
 from attacks.optimize import Optimization
 from metrics.fid_score import FID_Score
 from metrics.prcd import PRCD
 from utils.evaluation import evaluate_results
-from utils.evaluation_sg import evaluate_results_sg
 from datasets.custom_subset import ClassSubset
 from utils.attack_config_parser import AttackConfigParser
 from utils.datasets import get_facescrub_idx_to_class
@@ -28,12 +26,11 @@ def create_parser():
     parser = argparse.ArgumentParser(description='Performing model inversion attack')
     parser.add_argument('-c',
                         '--config',
-                        # default='./configs/attacking/GMI_CelebA1000.yaml',
-                        default='./configs/attacking/GMI_CelebA100_ir152.yaml',
+                        default='./gmi_stylegan-celeba_vgg16-celeba.yaml',
                         type=str,
                         dest="config",
                         help='Config .json file path (default: None)')
-    parser.add_argument('--exp_name', '-exp', default='stylegan_celeba_100cls_test', help='')
+    parser.add_argument('--exp_name', '-exp', default='stylegan_celeba_vgg16', help='')
     parser.add_argument('--stylegan', '-sg', action='store_true', help='use styleGAN')
     
     
@@ -122,7 +119,6 @@ def attack_single_id(targetnets, z, G, D, evaluation_model, targets_single_id):
         # Concatenate optimized style vectors
         z_optimized_unselected = torch.cat(z_optimized, dim=0)
 
-
         torch.cuda.empty_cache()
 
     mi_time = time.time() - start_time
@@ -143,23 +139,14 @@ def attack_single_id(targetnets, z, G, D, evaluation_model, targets_single_id):
     torch.save(final_z.detach(), final_z_path)
     torch.save(z_optimized_unselected.detach(), final_z_unselected_path)
 
-    if args.stylegan:
-        evaluate_results_sg(evaluation_model, 
-                        G.synthesis, args.stylegan,
-                        batch_size, idx_to_class,
-                        final_z, final_targets,
-                        training_dataset,
-                        targets_single_id,
-                        id_save_dir,
-                        save_dir)
-    else:
-        evaluate_results(evaluation_model, G,
-                        batch_size, idx_to_class,
-                        final_z, final_targets,
-                        training_dataset,
-                        targets_single_id,
-                        id_save_dir,
-                        save_dir)
+    evaluate_results(evaluation_model,
+                    G, False,
+                    batch_size, idx_to_class,
+                    final_z, final_targets,
+                    training_dataset,
+                    targets_single_id,
+                    id_save_dir,
+                    save_dir)
 
     return final_z, final_targets
 
@@ -238,8 +225,6 @@ if __name__ == '__main__':
     
     save_dir = f"{prefix}/{args.exp_name}_{current_time}"
 
-    # save_dir = f"{prefix}/{current_time}"
-
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     config.save_config(save_dir)
     utils.Tee(os.path.join(save_dir, 'log.txt'))
@@ -273,8 +258,6 @@ if __name__ == '__main__':
     # Concatenate optimized style vectors
     all_final_z = torch.cat(all_final_z, dim=0)
     all_final_targets = torch.cat(all_final_targets, dim=0)
-
-    # z_optimized_unselected = torch.cat(z_optimized_unselected, dim=0)
 
     torch.cuda.empty_cache()
 

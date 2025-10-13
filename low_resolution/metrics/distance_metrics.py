@@ -9,12 +9,13 @@ from torchvision.transforms.transforms import Resize
 
 
 class DistanceEvaluation():
-    def __init__(self, model, generator, dataset, seed):
+    def __init__(self, model, generator, stylegan, dataset, seed):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.train_set = dataset
         self.model = model
         self.seed = seed
         self.generator = generator
+        self.stylegan = stylegan
 
     def compute_dist(self, z, targets, batch_size=64):
         self.model.eval()
@@ -45,13 +46,20 @@ class DistanceEvaluation():
                     z_batch = z_batch[0].to(self.device)
                     current_targets = torch.full((batch_size,), target, dtype=torch.long, device=self.device)
                     try:
-                        imgs = self.generator(z_batch)
+                        if self.stylegan:
+                            imgs = self.generator(z_batch, noise_mode='const', force_fp32=True)
+                            min_val = imgs.min().item()
+                            max_val = imgs.max().item()
+                            imgs = (imgs - min_val) / (max_val - min_val)
+                        else:
+                            imgs = self.generator(z_batch)
                     except:
+                        # cGAN
                         imgs = self.generator(z_batch, current_targets)
                     if self.train_set.name == 'celeba':
                         imgs = self.low2high(imgs)
                     imgs = imgs.to(self.device)
-                    outputs, _ = self.model(imgs)
+                    outputs = self.model(imgs)[-1]
 
                     attack_embeddings.append(outputs.cpu())
 

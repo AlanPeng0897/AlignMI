@@ -8,9 +8,10 @@ import torchvision.transforms as T
 
 
 class ClassificationAccuracy():
-    def __init__(self, evaluation_network, device='cuda:0'):
+    def __init__(self, evaluation_network, stylegan, device='cuda:0'):
         self.evaluation_network = evaluation_network
         self.device = device
+        self.stylegan = stylegan
 
     def compute_acc(self, z, targets, generator, batch_size=64, rtpt=None):
         # self.evaluation_network.eval()
@@ -32,11 +33,17 @@ class ClassificationAccuracy():
                 z_batch, target_batch = z_batch.to(
                     self.device), target_batch.to(self.device)
                 try:
-                    imgs = generator(z_batch)
+                    if self.stylegan:
+                        imgs = generator(z_batch, noise_mode='const', force_fp32=True)
+                        min_val = imgs.min().item()
+                        max_val = imgs.max().item()
+                        imgs = (imgs - min_val) / (max_val - min_val)
+                    else:
+                        imgs = generator(z_batch)
                 except:
+                    # cGAN
                     imgs = generator(z_batch, target_batch)
                 imgs = imgs.to(self.device)
-                # _, output = self.evaluation_network(self.low2high(imgs))[-1]
 
                 output = self.evaluation_network(self.low2high(imgs))[-1]
 
@@ -79,7 +86,7 @@ class ClassificationAccuracy():
                 conf_masked = confidences[mask]
                 precision = torch.sum(predictions[mask] == t) / torch.sum(targets == t)
 
-                top5_correct = torch.sum(top5_predictions[mask] == t, dim=1) > 0  #
+                top5_correct = torch.sum(top5_predictions[mask] == t, dim=1) > 0
                 top5_precision = torch.sum(top5_correct).float() / torch.sum(targets == t)
 
                 precision_list.append(

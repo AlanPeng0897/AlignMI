@@ -16,9 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description='Training a target classifier')
     parser.add_argument('-c',
                         '--config',
-                        # default='./configs/training/targets/vgg16_100cls.yaml',
-                        default='./configs/training/targets/facenet64_100cls.yaml',
-                        # default='./configs/training/targets/ir152_100cls.yaml',
+                        default='./configs/training/targets/vgg16_100cls.yaml',
                         type=str,
                         dest="config",
                         help='Config .json file path (default: None)')

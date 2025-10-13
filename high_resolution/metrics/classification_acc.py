@@ -3,20 +3,28 @@ import math
 import torch
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import TensorDataset
+from utils.stylegan import create_image
+
 from metrics.accuracy import Accuracy, AccuracyTopK
-import torchvision.transforms as T
 
 
 class ClassificationAccuracy():
-    def __init__(self, evaluation_network, stylegan, device='cuda:0'):
+
+    def __init__(self, evaluation_network, device='cuda:0'):
         self.evaluation_network = evaluation_network
         self.device = device
-        self.stylegan = stylegan
 
-    def compute_acc(self, z, targets, generator, batch_size=64, rtpt=None):
-        # self.evaluation_network.eval()
+    def compute_acc(self,
+                    w,
+                    targets,
+                    generator,
+                    config,
+                    batch_size=64,
+                    resize=299,
+                    rtpt=None):
+        self.evaluation_network.eval()
         self.evaluation_network.to(self.device)
-        dataset = TensorDataset(z, targets)
+        dataset = TensorDataset(w, targets)
         acc_top1 = Accuracy()
         acc_top5 = AccuracyTopK(k=5)
         predictions = []
@@ -28,23 +36,17 @@ class ClassificationAccuracy():
         max_iter = math.ceil(len(dataset) / batch_size)
 
         with torch.no_grad():
-            for step, (z_batch, target_batch) in enumerate(
+            for step, (w_batch, target_batch) in enumerate(
                     DataLoader(dataset, batch_size=batch_size, shuffle=False)):
-                z_batch, target_batch = z_batch.to(
+                w_batch, target_batch = w_batch.to(
                     self.device), target_batch.to(self.device)
-                
-                if self.stylegan:
-                    imgs = generator(z_batch, noise_mode='const', force_fp32=True)
-                    min_val = imgs.min().item()
-                    max_val = imgs.max().item()
-                    imgs = (imgs - min_val) / (max_val - min_val)
-                else:
-                    imgs = generator(z_batch)
-                
+                imgs = create_image(w_batch,
+                                    generator,
+                                    config.attack_center_crop,
+                                    resize=resize,
+                                    batch_size=batch_size)
                 imgs = imgs.to(self.device)
-                # _, output = self.evaluation_network(self.low2high(imgs))[-1]
-
-                output = self.evaluation_network(self.low2high(imgs))[-1]
+                output = self.evaluation_network(imgs)
 
                 acc_top1.update(output, target_batch)
                 acc_top5.update(output, target_batch)
@@ -75,7 +77,7 @@ class ClassificationAccuracy():
                                        dim=0).mean().cpu().item()
 
             predictions = torch.cat(predictions, dim=0).cpu()
-            top5_predictions = torch.cat(top5_predictions, dim=0)  
+            top5_predictions = torch.cat(top5_predictions, dim=0)  # 合并所有批次的 top-5 预测
 
             # Compute class-wise precision
             target_list = targets.cpu().tolist()
@@ -86,7 +88,7 @@ class ClassificationAccuracy():
                 precision = torch.sum(predictions[mask] == t) / torch.sum(targets == t)
 
                 top5_correct = torch.sum(top5_predictions[mask] == t, dim=1) > 0  #
-                top5_precision = torch.sum(top5_correct).float() / torch.sum(targets == t) 
+                top5_precision = torch.sum(top5_correct).float() / torch.sum(targets == t)  # 计算 top-5 precision
 
                 precision_list.append(
                     [t, conf_masked.mean().item(),
@@ -94,31 +96,10 @@ class ClassificationAccuracy():
             confidences = confidences.tolist()
             predictions = predictions.tolist()
 
-        if rtpt:
-            rtpt.step(
-                subtitle=f'Classification Evaluation step {step} of {max_iter}')
+            if rtpt:
+                rtpt.step(
+                    subtitle=
+                    f'Classification Evaluation step {step} of {max_iter}')
 
         return acc_top1, acc_top5, predictions, avg_correct_conf, avg_total_conf, \
             confidences, maximum_confidences, precision_list
-
-    def get_deprocessor(self):
-        # resize 112,112
-        proc = []
-        proc.append(T.Resize((112, 112)))
-        proc.append(T.ToTensor())
-        return T.Compose(proc)
-
-
-    def low2high(self, img):
-        # 0 and 1, 64 to 112
-        bs = img.size(0)
-        proc = self.get_deprocessor()
-        img_tensor = img.detach().cpu().float()
-        img = torch.zeros(bs, 3, 112, 112)
-        for i in range(bs):
-            img_i = T.ToPILImage()(img_tensor[i, :, :, :]).convert('RGB')
-            img_i = proc(img_i)
-            img[i, :, :, :] = img_i[:, :, :]
-
-        img = img.cuda()
-        return img
