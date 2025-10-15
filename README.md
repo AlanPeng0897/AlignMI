@@ -90,3 +90,16 @@ CUDA_VISIBLE_DEVICES=0 python attack_gmi.py -sg \
   --config configs/attacking/gmi_stylegan-celeba_vgg16-celeba.yaml
 ```
 
+
+
+
+## References
+If you find this code helpful in your research, please consider citing
+```bibtex
+@inproceedings{peng2025AlignMI,
+title={Generative Model Inversion Through the Lens of the Manifold Hypothesis},
+author={Peng, Xiong and Han, Bo and Yu, Fengfei and Liu, Tongliang and Liu, Feng and Zhou, Mingyuan},
+booktitle={NeurIPS},
+year={2025}
+}
+```
