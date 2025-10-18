@@ -25,37 +25,21 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def build_transformations(transformations_dict=None) -> T.Compose:
     transformations_dict = {
-        # "RandomResizedCrop": {
-        #     "size": 224,
-        #     "scale": [0.8, 1.0],
-        #     "ratio": [0.9, 1.1],
-        #     "antialias": True
-        # },
-        # "RandomHorizontalFlip": {
-        #     "p": 0.5
-        # },
-        # "RandomRotation": {
-        #     "degrees": 5,  # ±15°
-        #     "interpolation": InterpolationMode.BILINEAR,
-        #     "expand": False,
-        #     "center": None
-        # },
-
         "RandomResizedCrop": {
             "size": 224,
-            "scale": [0.7, 1.0],
-            "ratio": [0.8, 1.2],
+            "scale": [0.8, 1.0],
+            "ratio": [0.9, 1.1],
             "antialias": True
         },
         "RandomHorizontalFlip": {
             "p": 0.5
         },
         "RandomRotation": {
-            "degrees": 5,  # ±15°
+            "degrees": 5,  # ±5°
             "interpolation": InterpolationMode.BILINEAR,
             "expand": False,
             "center": None
-        }
+        },
     }
 
     transformation_list = []
