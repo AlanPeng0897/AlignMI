@@ -10,19 +10,26 @@ This repository provides tools to empirically validate gradient–manifold align
 
 ---
 
-<table>
+<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+  <colgroup>
+    <col style="width:20%;">
+    <col style="width:80%;">
+  </colgroup>
   <tr>
-    <td style="vertical-align: middle; width: 50%;">
-      <p>
+    <td style="vertical-align:middle; padding-right:16px;">
+      <p style="margin:0; word-break:break-word;">
         <strong>Geometric interpretation of loss gradients projection onto the generator manifold.</strong>
         The generative model inversion process implicitly denoises the loss gradients by projecting them onto the tangent space of the generator manifold. The bottom panel illustrates the reconstructed image, its inversion-time loss gradients, the manifold-projected gradients, and the residual component.
       </p>
     </td>
-    <td style="text-align: right; width: 50%;">
-      <img src="./asset/AlignMI.png" alt="AlignMI" width="420" style="max-width:100%; height:auto;">
+    <td style="text-align:right;">
+      <img src="./asset/AlignMI.png" alt="AlignMI"
+           style="width:100%; max-width:1000px; height:auto; display:block; margin-left:auto;">
     </td>
   </tr>
 </table>
+
+
 
 
 # 🚀 Getting started
