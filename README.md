@@ -1,13 +1,29 @@
 <h1 align="center">Generative Model Inversion Through the Lens of the Manifold Hypothesis</h1>
 <p align="center">
     <a href="https://github.com/AlanPeng0897/AlignMI"><img src="https://img.shields.io/badge/-Github-grey?logo=github" alt="Github"></a>
-    <a href="https://arxiv.org/pdf/2509.20177"> <img src="https://img.shields.io/badge/NeurIPS'25-blue" alt="License"> </a>
+    <a href="https://neurips.cc/virtual/2025/poster/117375"> <img src="https://img.shields.io/badge/NeurIPS'25-blue" alt="License"> </a>
+    <a href="https://arxiv.org/pdf/2509.20177"><img src="https://img.shields.io/badge/arXiv-2509.20177-b31b1b.svg" alt="Paper"></a>
 </p>
 
 Hi, this is the code for our NeurIPS 2025 paper: *[Generative Model Inversion Through the Lens of the Manifold Hypothesis](https://arxiv.org/pdf/2509.20177)*.
 This repository provides tools to empirically validate gradient–manifold alignment hypotheses and train alignment-aware models for improved model inversion.
 
 ---
+
+<table>
+  <tr>
+    <td style="vertical-align: middle; width: 50%;">
+      <p>
+        <strong>Geometric interpretation of loss gradients projection onto the generator manifold.</strong>
+        The generative model inversion process implicitly denoises the loss gradients by projecting them onto the tangent space of the generator manifold. The bottom panel illustrates the reconstructed image, its inversion-time loss gradients, the manifold-projected gradients, and the residual component.
+      </p>
+    </td>
+    <td style="text-align: right; width: 50%;">
+      <img src="./asset/AlignMI.png" alt="AlignMI" width="420" style="max-width:100%; height:auto;">
+    </td>
+  </tr>
+</table>
+
 
 # 🚀 Getting started
 
@@ -143,17 +159,17 @@ Configuration files:
   - `./high_resolution/attacks/optimize.py` for PAA/TAA parameters and visualization settings. 
 
 ### 📦 Code script:
-#### ➤ Baseline (Standard PPA)
+#### ➡️ Baseline (Standard PPA)
 ```bash
 CUDA_VISIBLE_DEVICES=0  python -W ignore attack.py -c=./configs/attacking/CelebA_ResNet18_SG1024_bs50.yaml --exp_name=CelebA-ResNet18-id0-100;
 ```
 
-#### ➤ PAA (Perturbation-Averaged Alignment)
+#### ➡️ PAA (Perturbation-Averaged Alignment)
 ```bash
 CUDA_VISIBLE_DEVICES=0  python -W ignore attack_PAA.py -c=./configs/attacking/CelebA_ResNet18_SG1024_bs50.yaml --exp_name=CelebA-ResNet18-PAA-id0-100
 ```
 
-#### ➤ TAA (Transformation-Averaged Alignment)
+#### ➡️ TAA (Transformation-Averaged Alignment)
 ```bash
 CUDA_VISIBLE_DEVICES=0  python -W ignore attack_TAA.py -c=./configs/attacking/CelebA_ResNet18_SG1024_bs50.yaml --exp_name=CelebA-ResNet18-TAA-id0-100
 ```
@@ -166,21 +182,21 @@ Modify the configuration in
   - `./low_resolution/attacks/optimize.py` for PAA/TAA parameters and visualization settings.
 
 ### 📦 Code script: LOMMA (GMI) as an example:
-#### ➤ Baseline (Standard GMI)
+#### ➡️ Baseline (Standard GMI)
 ```bash
 CUDA_VISIBLE_DEVICES=0 python attack_gmi.py -sg \
   --exp_name celeba_vgg16_gmi_id0-100 \
   --config configs/attacking/gmi_stylegan-celeba_vgg16-celeba.yaml
 ```
 
-#### ➤ PAA (Perturbation-Averaged Alignment)
+#### ➡️ PAA (Perturbation-Averaged Alignment)
 ```bash
 CUDA_VISIBLE_DEVICES=0 python attack_gmi.py -sg \
   --exp_name celeba_vgg16_gmi_id0-100 \
   --config configs/attacking/gmi_stylegan-celeba_vgg16-celeba.yaml
 ```
 
-#### ➤ TAA (Transformation-Averaged Alignment)
+#### ➡️ TAA (Transformation-Averaged Alignment)
 ```bash
 CUDA_VISIBLE_DEVICES=0 python attack_gmi.py -sg \
   --exp_name celeba_vgg16_gmi_id0-100 \
