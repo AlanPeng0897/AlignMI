@@ -1,11 +1,17 @@
 <h1 align="center">Generative Model Inversion Through the Lens of the Manifold Hypothesis</h1>
 <p align="center">
-    <a href="https://neurips.cc/virtual/2025/poster/117375"> <img src="https://img.shields.io/badge/NeurIPS'25-blue" alt="License"> </a>
-    <a href="https://arxiv.org/pdf/2509.20177"><img src="https://img.shields.io/badge/arXiv-2509.20177-b31b1b.svg" alt="Paper"></a>
+    <a href="https://neurips.cc/virtual/2025/poster/117375" style="text-decoration:none;">
+        <img src="https://img.shields.io/badge/NeurIPS'25-blue" alt="License">
+    </a>
+    <a href="https://arxiv.org/pdf/2509.20177" style="text-decoration:none;">
+        <img src="https://img.shields.io/badge/arXiv-2509.20177-b31b1b.svg" alt="Paper">
+    </a>
 </p>
 
 Hi, this is the code for our NeurIPS 2025 paper: *[Generative Model Inversion Through the Lens of the Manifold Hypothesis](https://arxiv.org/pdf/2509.20177)*.
 This repository provides tools to empirically validate gradient–manifold alignment hypotheses and train alignment-aware models for improved model inversion.
+
+
 
 ---
 
