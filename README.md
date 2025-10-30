@@ -1,6 +1,5 @@
 <h1 align="center">Generative Model Inversion Through the Lens of the Manifold Hypothesis</h1>
 <p align="center">
-    <a href="https://github.com/AlanPeng0897/AlignMI"><img src="https://img.shields.io/badge/-Github-grey?logo=github" alt="Github"></a>
     <a href="https://neurips.cc/virtual/2025/poster/117375"> <img src="https://img.shields.io/badge/NeurIPS'25-blue" alt="License"> </a>
     <a href="https://arxiv.org/pdf/2509.20177"><img src="https://img.shields.io/badge/arXiv-2509.20177-b31b1b.svg" alt="Paper"></a>
 </p>
